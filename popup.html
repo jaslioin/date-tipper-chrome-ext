@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        background: linear-gradient(45deg, pink, transparent);
+      }
+      #date-tip {
+        padding: 20px;
+        position: relative;
+        border: 6px black dashed;
+      }
+      #result-area {
+        display: flex;
+        flex-direction: column;
+        min-width: 400px;
+      }
+      #result-area div {
+        min-width: max-content;
+        font-size: 2rem;
+      }
+      #msg {
+        width: auto;
+        border: 2px solid hotpink;
+        padding: 10px;
+        color: red;
+        font-size: 1rem;
+        text-align: center;
+        margin: 10px 0;
+      }
+      #heart {
+        width: 20%;
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+        opacity: 0.5;
+      }
+      label {
+        display: block;
+      }
+    </style>
+    <script src="popup.js"></script>
+  </head>
+  <body>
+    <div id="date-tip">
+      <img src="./icon.png" alt="heart" id="heart" />
+      <div id="result-area">
+        <div id="result-day"></div>
+        <div id="result-month"></div>
+        <div id="result-year"></div>
+      </div>
+      <div id="msg-area">
+        <div id="msg"></div>
+      </div>
+      <div id="predictor">
+        <label for="year">Year</label>
+        <input
+          type="number"
+          name="year"
+          id="predict-year"
+          min="1970"
+          max="2999"
+        />
+        <label for="month">Month</label>
+        <input type="number" name="month" id="predict-month" min="1" max="12" />
+        <label for="date">Date</label>
+        <input type="number" name="date" id="predict-date" min="1" max="31" />
+      </div>
+    </div>
+  </body>
+</html>
