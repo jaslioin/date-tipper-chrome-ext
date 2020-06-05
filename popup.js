@@ -20,7 +20,12 @@ const SINCE = {
 const ONE_MONTH = 2678400000; //31*24*60*60*1000
 const ONE_DAY = ONE_MONTH / 31;
 const ONE_YEAR = ONE_MONTH * 12;
-
+function isHundredDividable(num) {
+  return num % 100 === 0;
+}
+function isLeapYear(year) {
+  return (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
+}
 class Lapse {
   /**
    * All about special days during 2 dates, answers these few questions:
@@ -98,6 +103,47 @@ class Lapse {
     }
     this.years = now.year - since.year - stepYear;
   }
+
+  async calculateFutureSpecialDates(year, month, date) {
+    return new Promise((res, rej) => {
+      const result = [];
+      for (let y = this.since.year; y <= year; y++) {
+        if (y == this.since.year) {
+          for (let m = this.since.month; m <= 12; m++) {
+            for (
+              let d = this.since.date + 1;
+              d <= this.monthDaysMapping[m];
+              d++
+            ) {
+              const memorable = new Lapse(this.since, {
+                year: y,
+                month: m,
+                date: d,
+              }).getMemorable();
+              if (memorable.length) {
+                result.push([y, m, d, memorable]);
+              }
+            }
+          }
+        } else {
+          for (let m = 1; m <= 12; m++) {
+            for (let d = 1; d <= this.monthDaysMapping[m]; d++) {
+              const memorable = new Lapse(this.since, {
+                year: y,
+                month: m,
+                date: d,
+              }).getMemorable();
+              if (memorable.length) {
+                result.push([y, m, d, memorable]);
+              }
+            }
+          }
+        }
+      }
+      res(result);
+    });
+  }
+
   setUniqNum(number, meaning) {
     this.UNIQUE_NUM[number] = meaning;
   }
@@ -131,7 +177,7 @@ class Lapse {
     // start year
     let daysPassedThatYear = 0;
     for (let m = month; m <= 12; m++) {
-      if (m === 2 && this.isLeapYear(year)) {
+      if (m === 2 && isLeapYear(year)) {
         daysPassedThatYear++;
       }
       if (m === month) {
@@ -144,7 +190,7 @@ class Lapse {
     let fullYearDaysPassed = 0;
 
     for (let i = year + 1; i < thisYear; i++) {
-      if (this.isLeapYear(i)) {
+      if (isLeapYear(i)) {
         fullYearDaysPassed += 366;
         continue;
       }
@@ -153,7 +199,7 @@ class Lapse {
     // this year
     let daysPassedCurrentYear = 0;
     for (let m = 1; m < thisMonth; m++) {
-      if (m === 2 && this.isLeapYear(thisYear)) {
+      if (m === 2 && isLeapYear(thisYear)) {
         daysPassedCurrentYear++;
       }
       daysPassedCurrentYear += this.monthDaysMapping[m];
@@ -166,18 +212,19 @@ class Lapse {
 
     return daysPassedInTotal;
   }
-  getMemorable() {
+  getMemorable(
+    totalMonths = this.getMonthLapse().months,
+    totalDays = this.getDayLapse(),
+    totalYears = this.years
+  ) {
     const result = [];
-    const totalMonths = this.getMonthLapse().months;
-    const totalDays = this.getDayLapse();
-    const totalYears = this.years;
-    if (this.isHundredDividable(totalMonths)) {
+    if (isHundredDividable(totalMonths)) {
       result.push(`${totalMonths} months!`);
     }
-    if (totalYears > 0 && this.isHundredDividable(totalYears)) {
+    if (totalYears > 0 && isHundredDividable(totalYears)) {
       result.push(`${totalYears} years!`);
     }
-    if (this.isHundredDividable(totalDays)) {
+    if (isHundredDividable(totalDays)) {
       result.push(`${totalDays} days!`);
     }
     if (this.isUnique(totalMonths)) {
@@ -200,9 +247,7 @@ class Lapse {
     }
     return result;
   }
-  isHundredDividable(num) {
-    return num % 100 === 0;
-  }
+
   isUnique = (num) => {
     return this.UNIQUE_NUM[num];
   };
@@ -219,9 +264,6 @@ class Lapse {
   ) => {
     return this.UNIQUE_NUM[Number(months + "" + days)];
   };
-  isLeapYear(year) {
-    return (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
-  }
 }
 
 const DateTipper = (function () {
