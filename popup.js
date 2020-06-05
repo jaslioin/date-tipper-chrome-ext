@@ -36,6 +36,12 @@ class Lapse {
       stepMonth = 0;
     this.since = since;
     this.now = now;
+    this.UNIQUE_NUM = {
+      520: "I LOVE U",
+      521: "I LOVE U",
+      1314: "Together forever",
+      27: "CONFESSION DAY",
+    };
     this.monthDaysMapping = {
       1: 31,
       2: 28, //add one when leap year
@@ -90,14 +96,10 @@ class Lapse {
     } else {
       this.months = 0;
     }
-
     this.years = now.year - since.year - stepYear;
-    this.UNIQUE_NUM = {
-      520: "我愛你",
-      521: "我愛你",
-      1314: "一生一世",
-      27: "CONFESSION DAY",
-    };
+  }
+  setUniqNum(number, meaning) {
+    this.UNIQUE_NUM[number] = meaning;
   }
   getAllLapse() {
     return {
@@ -107,7 +109,7 @@ class Lapse {
     };
   }
   getYearLapse() {
-    //broken
+    // inaccurate
     return {
       num: this.years + this.months / 12 + this.days / 365,
     };
@@ -179,16 +181,22 @@ class Lapse {
       result.push(`${totalDays} days!`);
     }
     if (this.isUnique(totalMonths)) {
-      result.push(`${totalMonths}(${this.UNIQUE_NUM[totalMonths]}) months!`);
+      result.push(`${totalMonths}( ${this.UNIQUE_NUM[totalMonths]} ) months!`);
     }
     if (this.isUnique(totalDays)) {
-      result.push(`${totalDays}(${this.UNIQUE_NUM[totalDays]}) days!`);
+      result.push(`${totalDays}( ${this.UNIQUE_NUM[totalDays]} ) days!`);
     }
     if (this.isUnique(totalYears)) {
-      result.push(`${totalYears}(${this.UNIQUE_NUM[totalYears]}) years!`);
+      result.push(`${totalYears}( ${this.UNIQUE_NUM[totalYears]} ) years!`);
     }
     if (this.months === 0 && this.days === 0) {
       result.push(`${this.years} year-anniversary!`);
+    }
+    if (this.isUniqueMD()) {
+      result.push(this.isUniqueMD());
+    }
+    if (this.isUniqueYMD()) {
+      result.push(this.isUniqueYMD());
     }
     return result;
   }
@@ -198,54 +206,78 @@ class Lapse {
   isUnique = (num) => {
     return this.UNIQUE_NUM[num];
   };
+  isUniqueYMD = (
+    years = this.years,
+    months = this.months,
+    days = this.days
+  ) => {
+    return this.UNIQUE_NUM[Number(years + "" + months + "" + days)];
+  };
+  isUniqueMD = (
+    months = this.getMonthLapse().months,
+    days = this.getMonthLapse().days
+  ) => {
+    return this.UNIQUE_NUM[Number(months + "" + days)];
+  };
   isLeapYear(year) {
     return (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
   }
 }
 
-function predict(e) {
-  console.log(e);
-  const predictYear = document.getElementById("predict-year").valueAsNumber;
-  const predictMonth = document.getElementById("predict-month").valueAsNumber;
-  const predictDate = document.getElementById("predict-date").valueAsNumber;
-  if (predictYear > 0 && predictMonth > 0 && predictDate > 0) {
-    update(predictYear, predictMonth, predictDate);
+const DateTipper = (function () {
+  function predict(e) {
+    const predictYear = document.getElementById("predict-year").valueAsNumber;
+    const predictMonth = document.getElementById("predict-month").valueAsNumber;
+    const predictDate = document.getElementById("predict-date").valueAsNumber;
+    if (predictYear > 0 && predictMonth > 0 && predictDate > 0) {
+      update(predictYear, predictMonth, predictDate);
+    }
   }
-}
 
-function update(predictYear, predictMonth, predictDate) {
-  const timeLapse = new Lapse(SINCE, {
-    year: predictYear,
-    month: predictMonth,
-    date: predictDate,
-  });
-  console.log(timeLapse);
+  function update(predictYear, predictMonth, predictDate) {
+    const timeLapse = new Lapse(SINCE, {
+      year: predictYear,
+      month: predictMonth,
+      date: predictDate,
+    });
+    window.timeLapse = timeLapse;
+    console.log(timeLapse);
 
-  const dayDiv = document.getElementById(`result-day`);
-  const monthDiv = document.getElementById(`result-month`);
-  const yearDiv = document.getElementById(`result-year`);
-  const totalDays = timeLapse.getDayLapse();
-  const months = timeLapse.getMonthLapse();
-  const years = timeLapse.getAllLapse();
-  dayDiv.innerText = totalDays + " days";
-  monthDiv.innerText = `${months.months} months ${months.days} days`;
-  yearDiv.innerText = `${years.years} years ${years.months} months ${years.days} days`;
+    const dayDiv = document.getElementById(`result-day`);
+    const monthDiv = document.getElementById(`result-month`);
+    const yearDiv = document.getElementById(`result-year`);
+    const totalDays = timeLapse.getDayLapse();
+    const months = timeLapse.getMonthLapse();
+    const years = timeLapse.getAllLapse();
+    dayDiv.innerText = totalDays + " days";
+    monthDiv.innerText = `${months.months} months ${months.days} days`;
+    yearDiv.innerText = `${years.years} years ${years.months} months ${years.days} days`;
 
-  const msgDiv = document.getElementById("msg");
-  const specialties = timeLapse.getMemorable();
-  msgDiv.innerText = "";
-  for (let i of specialties) {
-    const specialtyDiv = document.createElement("div");
-    specialtyDiv.innerText = i;
-    msgDiv.appendChild(specialtyDiv);
+    const msgDiv = document.getElementById("msg");
+    const specialties = timeLapse.getMemorable();
+    msgDiv.innerText = "";
+    for (let i of specialties) {
+      const specialtyDiv = document.createElement("div");
+      specialtyDiv.innerText = i;
+      msgDiv.appendChild(specialtyDiv);
+    }
   }
-}
-document.addEventListener("DOMContentLoaded", function () {
-  update(NOW.year, NOW.month, NOW.date);
-  const predictYear = document.getElementById("predict-year");
-  const predictMonth = document.getElementById("predict-month");
-  const predictDate = document.getElementById("predict-date");
-  predictYear.oninput = predict;
-  predictDate.oninput = predict;
-  predictMonth.oninput = predict;
-});
+
+  function init() {
+    document.addEventListener("DOMContentLoaded", function () {
+      update(NOW.year, NOW.month, NOW.date);
+      const predictYear = document.getElementById("predict-year");
+      const predictMonth = document.getElementById("predict-month");
+      const predictDate = document.getElementById("predict-date");
+      predictYear.oninput = predict;
+      predictDate.oninput = predict;
+      predictMonth.oninput = predict;
+    });
+  }
+  return {
+    predict,
+    update,
+    init,
+  };
+})();
+DateTipper.init();
