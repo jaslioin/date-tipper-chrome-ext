@@ -21,7 +21,7 @@ const ONE_MONTH = 2678400000; //31*24*60*60*1000
 const ONE_DAY = ONE_MONTH / 31;
 const ONE_YEAR = ONE_MONTH * 12;
 function isHundredDividable(num) {
-  return num % 100 === 0;
+  return num != 0 && num % 100 === 0;
 }
 function isLeapYear(year) {
   return (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
