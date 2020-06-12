@@ -121,7 +121,20 @@ class Lapse {
                 date: d,
               }).getMemorable();
               if (memorable.length) {
-                result.push([y, m, d, memorable]);
+                result.push({ y, m, d, memorable });
+              }
+            }
+          }
+        } else if (y == year) {
+          for (let m = 1; m <= month; m++) {
+            for (let d = 1; d <= this.monthDaysMapping[m]; d++) {
+              const memorable = new Lapse(this.since, {
+                year: y,
+                month: m,
+                date: d,
+              }).getMemorable();
+              if (memorable.length) {
+                result.push({ y, m, d, memorable });
               }
             }
           }

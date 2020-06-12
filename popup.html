@@ -17,13 +17,13 @@
       }
       #result-area div {
         min-width: max-content;
-        font-size: 2rem;
+        font-size: 1.5rem;
       }
       #msg {
         width: auto;
-        border: 2px solid hotpink;
+        border: 2px solid #f26a8d;
         padding: 10px;
-        color: red;
+        color: #dd2d4a;
         font-size: 1rem;
         text-align: center;
         margin: 10px 0;
@@ -33,16 +33,35 @@
         position: absolute;
         right: 20px;
         bottom: 20px;
-        opacity: 0.5;
+        opacity: 0.2;
+        user-select: none;
       }
-      label {
-        display: block;
+      #navbar {
+        display: flex;
+        background-color: rgba(250, 106, 106, 0.5);
+        justify-content: space-around;
+      }
+      #navbar > div {
+        user-select: none;
+        width: 100%;
+        text-align: center;
+        cursor: pointer;
+      }
+      #navbar > div:hover {
+        background-color: rgb(250, 106, 106);
+        color: white;
+        width: 100%;
       }
     </style>
     <script src="popup.js"></script>
   </head>
   <body>
     <div id="date-tip">
+      <div id="navbar">
+        <div id="date-group-1">DateGroup1</div>
+        <div id="date-group-2">DateGroup2</div>
+        <div id="date-group-3">DateGroup3</div>
+      </div>
       <img src="./icon.png" alt="heart" id="heart" />
       <div id="result-area">
         <div id="result-day"></div>
